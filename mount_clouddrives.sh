@@ -3,7 +3,8 @@
 # Mounting rclone services in linux
 # toni.patama@gmail.com 2023
 ####################################################
-
+ver=0.91
+dt=2023.05.08
 #--------------------------------
 # Global settings
 #--------------------------------
@@ -72,15 +73,20 @@ unmount_service()
 
 		# Don't use the kill because it is not gender. It breaks the folder and script is not working after that
 		fusermount -uz $services_mainpath"/"$sname_lower
+		
 		# rm pidfile...
 	else
 		echo "Service wasn't found running.. Nothing to do"
 	fi
 }
 
+#-------------
 # Main program
+#-------------
 
-echo "Mount Cloud drives\n\nVersion: 0.9 2023.05.08 tonipat047@gmail.com\n"
+echo -en "Mount Cloud Drives\n-------------------------------\n"
+echo -en "Version: "$ver"\n"$dt" tonipat047@gmail.com\n"
+echo -en "-------------------------------\n"
 
 if [ "$1" ]
 then
@@ -106,7 +112,7 @@ else
 			
 			while ! [ "$confi" ] || [ "$confi" != "y" ] && [ "$confi" != "n" ]
 			do
-				echo "Should I quit service: \""$service_name"\"? Answer (y)es/(n)o and enter";
+				echo "Should I unmount service: \""$service_name"\"? Answer (y)es/(n)o and enter";
 				read confi
 				if [ "$confi" == "y" ]
 				then
@@ -124,7 +130,7 @@ else
 			done
 			
 		else
-			echo "The service will start after 5 seconds..CTRL-C to cancel";
+			echo "The service will start after 5 seconds.. Press CTRL-C to cancel!";
 			l=0
 			while [ $l -lt 5 ]
 			do
