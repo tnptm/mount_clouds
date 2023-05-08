@@ -144,7 +144,6 @@ else
 			start_service
 			echo "Done!"
 		fi		
-		
 	done
 fi
 
