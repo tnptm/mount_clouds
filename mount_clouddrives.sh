@@ -1,12 +1,17 @@
 #!/bin/bash
-###################################################
-# Mounting rclone services in linux
-# toni.patama@gmail.com 2023
-####################################################
+#################################################
+#
+# Mounting rclone services in linux         	#
+#
+# tonipat047@gmail.com 		 					#
+#
+#################################################
+
 ver=0.91
 dt=2023.05.08
+
 #--------------------------------
-# Global settings
+# Global settings               |
 #--------------------------------
 
 # Main directory path where under cloud service directories will be mounted
@@ -38,7 +43,7 @@ test_service()
 	if [ -s $pidfile ] 
 	then
 		# read pid from pidfile
-		tpid=`cat $tmp_dir"/"$sname_lower".pid"|grep ^[0-9]*$`
+		tpid=`cat $pidfile |grep ^[0-9]*$`
 		
 		# Is service really running?
 		if [ `ps -C rclone | grep $tpid | wc -l` == "0" ]
@@ -57,10 +62,11 @@ test_service()
 start_service()
 {
 	echo "Service: "$service_name" mounting.."
+	echo "Mountpoint: "$mountpoint
 
 	# mountpoint and rclone service name must be defined with lowercase. PID read to variable PIDR
-	rclone --vfs-cache-mode writes mount $sname_lower: $services_mainpath"/"$sname_lower & PIDR=$!
-	echo $PIDR > $tmp_dir"/"$sname_lower".pid"
+	rclone --vfs-cache-mode writes mount $sname_lower: $mountpoint & PIDR=$!
+	echo $PIDR > $pidfile
 }
 
 # Unmount the service based on mount directory, if process exists 
@@ -72,7 +78,7 @@ unmount_service()
 		#kill -9 $tpid # don't use
 
 		# Don't use the kill because it is not gender. It breaks the folder and script is not working after that
-		fusermount -uz $services_mainpath"/"$sname_lower
+		fusermount -uz $mountpoint
 		
 		# rm pidfile...
 	else
@@ -80,9 +86,9 @@ unmount_service()
 	fi
 }
 
-#-------------
-# Main program
-#-------------
+#----------------
+# Main program  |
+#----------------
 
 echo -en "Mount Cloud Drives\n-------------------------------\n"
 echo -en "Version: "$ver"\n"$dt" tonipat047@gmail.com\n"
@@ -100,6 +106,7 @@ else
 		# lowercase of name
 		sname_lower=`echo $service_name| tr '[:upper:]' '[:lower:]'`
 		pidfile=$tmp_dir"/"$sname_lower".pid"
+		mountpoint=$services_mainpath"/"$sname_lower
 
 		
 		# test service alive, if yes ask, would you like to kill it
@@ -144,7 +151,6 @@ else
 			start_service
 			echo "Done!"
 		fi		
-		
 	done
 fi
 
