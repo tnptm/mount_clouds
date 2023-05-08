@@ -28,6 +28,8 @@ then
 	mkdir $tmp_dir
 fi
 
+# Functions
+
 # tests that service is alive and having the file
 test_service()
 {
@@ -76,65 +78,67 @@ unmount_service()
 	fi
 }
 
+# Main program
 
+echo "Mount Cloud drives\n\nVersion: 0.9 2023.05.08 tonipat047@gmail.com\n"
 
+if [ "$1" ]
+then
+	echo "Usage: mount_clouddrivers.sh"
+else
 # if [ -x $tm ]; then echo "yes"; else echo "no"; mkdir $tm; fi
 
-for service_name in ${services[@]}
-do
+	for service_name in ${services[@]}
+	do
 
-	# lowercase of name
-	sname_lower=`echo $service_name| tr '[:upper:]' '[:lower:]'`
-	pidfile=$tmp_dir"/"$sname_lower".pid"
+		# lowercase of name
+		sname_lower=`echo $service_name| tr '[:upper:]' '[:lower:]'`
+		pidfile=$tmp_dir"/"$sname_lower".pid"
 
-	
-	# test service alive, if yes ask, would you like to kill it
-	# if not existing -> start
-	
-	
-	test_service
-	if [ "$tpid" ] 
-	then
 		
-		while ! [ "$confi" ] || [ "$confi" != "y" ] && [ "$confi" != "n" ]
-		do
-			echo "Should I quit service: \""$service_name"\"? Answer (y)es/(n)o and enter";
-			read confi
-			if [ "$confi" == "y" ]
-			then
-				echo "Unmounting (fusermount) the "$service_name"..."
-				
-				# Calling the kill function
-				unmount_service
-				echo "Done!"
-				break
-			elif [ "$confi" == "n" ]
-			then
-				echo "Exiting..."
-				break
-			fi
-		done
+		# test service alive, if yes ask, would you like to kill it
+		# if not existing -> start
 		
-	else
-		echo "The service will start after 5 seconds..CTRL-C to cancel";
-		l=0
-		while [ $l -lt 5 ]
-		do
-			sleep 1
-			printf "."
-			let l++
-		done
-		echo "Starting"
 		
-		# Call start service function
-		start_service
-		echo "Done!"
-	fi		
-	
-done
-
-
-
-#echo "Google drive..."
-#echo "Google no available yet"
+		test_service
+		if [ "$tpid" ] 
+		then
+			
+			while ! [ "$confi" ] || [ "$confi" != "y" ] && [ "$confi" != "n" ]
+			do
+				echo "Should I quit service: \""$service_name"\"? Answer (y)es/(n)o and enter";
+				read confi
+				if [ "$confi" == "y" ]
+				then
+					echo "Unmounting (fusermount) the "$service_name"..."
+					
+					# Calling the kill function
+					unmount_service
+					echo "Done!"
+					break
+				elif [ "$confi" == "n" ]
+				then
+					echo "Exiting..."
+					break
+				fi
+			done
+			
+		else
+			echo "The service will start after 5 seconds..CTRL-C to cancel";
+			l=0
+			while [ $l -lt 5 ]
+			do
+				sleep 1
+				printf "."
+				let l++
+			done
+			echo "Starting"
+			
+			# Call start service function
+			start_service
+			echo "Done!"
+		fi		
+		
+	done
+fi
 
