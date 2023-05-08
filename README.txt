@@ -1,7 +1,8 @@
 README
 
 This Bash script mount_clouddrives.sh was planned to be one of a kind 
-way of using rclone when having one or more cloud drives in Linux. 
+way of using rclone when having one or more cloud drives in Linux. It can 
+mount and unmount the services interactive way.
 
 The basic idea is to mount all services to one directory in your home 
 directory for easy access for project files or photos etc. It is not meant 
