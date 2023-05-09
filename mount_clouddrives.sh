@@ -7,7 +7,7 @@
 #
 #################################################
 
-ver=0.91
+ver=0.92
 dt=2023.05.08
 
 #--------------------------------
@@ -86,20 +86,9 @@ unmount_service()
 	fi
 }
 
-#----------------
-# Main program  |
-#----------------
 
-echo -en "Mount Cloud Drives\n-------------------------------\n"
-echo -en "Version: "$ver"\n"$dt" tonipat047@gmail.com\n"
-echo -en "-------------------------------\n"
-
-if [ "$1" ]
-then
-	echo "Usage: mount_clouddrivers.sh"
-else
-# if [ -x $tm ]; then echo "yes"; else echo "no"; mkdir $tm; fi
-
+# main function looping services
+mainf(){
 	for service_name in ${services[@]}
 	do
 
@@ -109,9 +98,7 @@ else
 		mountpoint=$services_mainpath"/"$sname_lower
 
 		
-		# test service alive, if yes ask, would you like to kill it
-		# if not existing -> start
-		
+		# test service alive?
 		
 		test_service
 		if [ "$tpid" ] 
@@ -152,5 +139,20 @@ else
 			echo "Done!"
 		fi		
 	done
+}
+
+#----------------
+# Main program  |
+#----------------
+
+echo -en "Mount Cloud Drives\n-------------------------------\n"
+echo -en "Version: "$ver"\n"$dt" tonipat047@gmail.com\n"
+echo -en "-------------------------------\n"
+
+if [ "$1" ]
+then
+	echo "Usage: mount_clouddrivers.sh"
+else
+	mainf
 fi
 
