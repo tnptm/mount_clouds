@@ -62,6 +62,7 @@ test_service()
 start_service()
 {
 	echo "Service: "$service_name" mounting.."
+	echo "Mountpoint: "$mountpoint
 
 	# mountpoint and rclone service name must be defined with lowercase. PID read to variable PIDR
 	rclone --vfs-cache-mode writes mount $sname_lower: $mountpoint & PIDR=$!
@@ -85,32 +86,19 @@ unmount_service()
 	fi
 }
 
-#----------------
-# Main program  |
-#----------------
 
-echo -en "Mount Cloud Drives\n-------------------------------\n"
-echo -en "Version: "$ver"\n"$dt" tonipat047@gmail.com\n"
-echo -en "-------------------------------\n"
-
-if [ "$1" ]
-then
-	echo "Usage: mount_clouddrivers.sh"
-else
-# if [ -x $tm ]; then echo "yes"; else echo "no"; mkdir $tm; fi
-
+# main function looping services
+mainf(){
 	for service_name in ${services[@]}
 	do
 
 		# lowercase of name
 		sname_lower=`echo $service_name| tr '[:upper:]' '[:lower:]'`
 		pidfile=$tmp_dir"/"$sname_lower".pid"
-		mountpoint=$service_mainpath"/"$sname_lower
+		mountpoint=$services_mainpath"/"$sname_lower
 
 		
-		# test service alive, if yes ask, would you like to kill it
-		# if not existing -> start
-		
+		# test service alive?
 		
 		test_service
 		if [ "$tpid" ] 
@@ -151,5 +139,20 @@ else
 			echo "Done!"
 		fi		
 	done
+}
+
+#----------------
+# Main program  |
+#----------------
+
+echo -en "Mount Cloud Drives\n-------------------------------\n"
+echo -en "Version: "$ver"\n"$dt" tonipat047@gmail.com\n"
+echo -en "-------------------------------\n"
+
+if [ "$1" ]
+then
+	echo "Usage: mount_clouddrivers.sh"
+else
+	mainf
 fi
 

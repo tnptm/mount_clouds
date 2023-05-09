@@ -25,3 +25,10 @@ home/user directory):
 	
 Tip: You can make to symbolic link to some bin directory, to add it to 
 $PATH or make alias to the script with command alias and put it to .bashrc.
+
+Requirements
+
+System is tested Ubuntu 22.04 based system
+
+- rclone 1.52
+- fuse: fusermount
