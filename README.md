@@ -24,12 +24,14 @@ help from web to set up your cloud drives like Onedrive or Google Drive.
 The structure of "clouds" directory is (recommended to be in your 
 home/user directory):
 
+```
 --clouds/
 	|--src/ (script dir)
 	|--.tmp/ (temporary file dir)
 	|--onedrive/ (service 1)
 	|--googledrive/ (service 2)
 	|...
+```
 	
 Tip: You can make to symbolic link to some bin directory, to add it to 
 $PATH or make alias to the script with command alias and put it to .bashrc.
