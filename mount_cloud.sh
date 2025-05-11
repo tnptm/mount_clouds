@@ -1,10 +1,12 @@
 #!/bin/bash
 #################################################
-#
+#												#
 # Mounting rclone services in linux         	#
-#
+# - only works with systems having fuse (not 	#
+#	compatible with MacOS)						#
+#												#	
 # author: tonipat047@gmail.com 					#
-#
+#												#	
 #################################################
 
 ver=0.99
@@ -100,13 +102,26 @@ start_service()
 	#echo $PIDR > $pidfile
 }
 
+find_fusermount_bin()
+{
+	if command -v fusermount3 &> /dev/null; then
+		FUSERMOUNT=$(command -v fusermount3)
+	elif command -v fusermount &> /dev/null; then
+		FUSERMOUNT=$(command -v fusermount)
+	else
+		echo "Error: fusermount or fusermount3 not found. Try manually umount command or kill the rclone process. Exiting..." >&2
+		exit 1
+	fi
+}
+
 # Unmount the service based on mount directory, if process exists 
 # 
 unmount_service()
 {
 	echo -n "Unmounting (fusermount) the "$service_name"... "
-	fusermount -uz $1
-		
+	find_fusermount_bin
+	
+	$FUSERMOUNT -uz $1
 }
 
 
