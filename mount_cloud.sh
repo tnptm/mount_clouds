@@ -3,7 +3,7 @@
 #
 # Mounting rclone services in linux         	#
 #
-# tonipat047@gmail.com 		 					#
+# author: tonipat047@gmail.com 					#
 #
 #################################################
 
@@ -86,29 +86,6 @@ dotline() {
   local width="$3"
   local dots=$(( width - ${#left} - ${#right} ))
   printf "%s%*s" "$left" $dots "."  | sed 's/ /./g'
-}
-
-
-
-# tests that service is alive and having the file (is depracated fuction)
-test_service()
-{
-	# testing does pidfile exist
-	if [ -s $pidfile ] 
-	then
-		# read pid from pidfile
-		tpid=`cat $pidfile |grep ^[0-9]*$`
-		
-		# Is service really running?
-		if [ `ps -C rclone | grep $tpid | wc -l` == "0" ]
-		then
-			tpid=""
-			echo -e "\n------------" # "Service isn't running."
-		fi
-	else
-		tpid=""
-	fi
-	#echo "Tpid result is: "$tpid
 }
 
 
