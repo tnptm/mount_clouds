@@ -8,7 +8,6 @@
 #################################################
 
 ver=0.99
-#dt=2023.05.08
 dt=2025.05.10
 
 #--------------------------------
@@ -48,6 +47,7 @@ fi
 is_cloudshare_mounted()
 {
 	# rclone mounts
+	# $1 = "service_name"
 	row_of_mount=(`mount | grep rclone | grep $1`)
 	if [ ${#row_of_mount[@]} -gt 0 ]
 	then
@@ -90,7 +90,7 @@ dotline() {
 
 
 
-# tests that service is alive and having the file
+# tests that service is alive and having the file (is depracated fuction)
 test_service()
 {
 	# testing does pidfile exist
@@ -119,25 +119,17 @@ start_service()
 	echo "Mountpoint: "$mountpoint
 
 	# mountpoint and rclone service name must be defined with lowercase. PID read to variable PIDR
-	rclone --vfs-cache-mode writes mount $service_name: $mountpoint & PIDR=$!
-	echo $PIDR > $pidfile
+	rclone --vfs-cache-mode writes mount $service_name: $mountpoint & # PIDR=$!
+	#echo $PIDR > $pidfile
 }
 
 # Unmount the service based on mount directory, if process exists 
+# 
 unmount_service()
 {
-	# if process really is alive still
-	if [ `ps -C rclone | grep $tpid | wc -l` == "1" ]
-	then
-		#kill -9 $tpid # don't use
-
-		# Don't use the kill because it is not gender. It breaks the folder and script is not working after that
-		fusermount -uz $mountpoint
+	echo -n "Unmounting (fusermount) the "$service_name"... "
+	fusermount -uz $1
 		
-		# rm pidfile...
-	else
-		echo "Service wasn't found running.. Nothing to do"
-	fi
 }
 
 
@@ -156,13 +148,9 @@ mainf(){
 		if [ $mounted -eq 1 ]
 		then
 			mounted_text="MOUNTED"
-			#color_text $mounted_text "green"
-			#mounted_color_text=$?
 			color="green"
 		else
 			mounted_text="NOT MOUNTED"
-			#color_text $mounted_text "red"
-			#mounted_color_text=$?
 			color="red"
 		fi
 		
@@ -210,35 +198,31 @@ mainf(){
 		
 		# lowercase of name
 		sname_lower=`echo $service_name| tr '[:upper:]' '[:lower:]'`
-		pidfile=$tmp_dir"/"$sname_lower".pid"
+		#pidfile=$tmp_dir"/"$sname_lower".pid"
 		mountpoint=$services_mainpath"/"$sname_lower
 
 
 
 		# test service alive?
+		is_cloudshare_mounted $service_name
+		local mounted=$?
 		
-		test_service
-		if [ "$tpid" ] 
+		if [ $mounted -eq 1 ]
 		then
-			
-			while ! [ "$confi" ] || [ "$confi" != "y" ] && [ "$confi" != "n" ]
-			do
-				echo -en "\nShould I unmount service: \""$service_name"\"?\n   Answer (y)es/(n)o and enter: ";
-				read confi
-				if [ "$confi" == "y" ]
-				then
-					echo "Unmounting (fusermount) the "$service_name"..."
-					
-					# Calling the kill function
-					unmount_service
-					echo "Done!"
-					break
-				elif [ "$confi" == "n" ]
-				then
-					echo "Exiting..."
-					break
-				fi
-			done
+
+			echo -en "\nDo you want to UNMOUNT the service: \""$service_name"\"?\n   Answer (y)es/(n)o and enter: ";
+			read confi
+			if [ "$confi" == "y" ]
+			then
+				# Calling the kill function
+				unmount_service $mountpoint
+				echo "Done!"
+				#break
+			elif [ "$confi" == "n" ]
+			then
+				echo "Nothing to do."
+				#exit
+			fi
 			
 		else
 			# check that if mountpoint directory doesn't exist. And if not, create it
@@ -273,12 +257,9 @@ echo -e "------------------------------------------------------------------"
 echo -en "| Mount Cloud Drives - vers. $ver $dt tonipat047@gmail.com |"
 echo -e "\n------------------------------------------------------------------\n"
 
-#echo -en "Version: "$ver"\n"$dt" tonipat047@gmail.com\n"
-#echo -e "-------------------------------\n"
-
 if [ "$1" ]
 then
-	echo "Usage: mount_clouddrivers.sh"
+	echo "Usage: mount_cloud.sh"
 else
 	mainf
 fi
