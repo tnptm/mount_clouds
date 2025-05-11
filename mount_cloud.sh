@@ -20,6 +20,9 @@ dt=2025.05.10
 
 services_mainpath=~/clouds
 
+DEBUG=0 #1
+
+
 # List of available services of rclone in your system 
 # NOTE: rclone must be set up before using this script
 
@@ -46,6 +49,15 @@ then
 fi
 
 # Functions
+debug()
+{
+	if [ $DEBUG -eq 1 ]
+	then
+		echo $1
+	fi	
+}
+
+
 is_cloudshare_mounted()
 {
 	# rclone mounts
@@ -85,9 +97,10 @@ dotline() {
   # result: text1........text2
   local left="$1"
   local right="$2"
-  local width="$3"
-  local dots=$(( width - ${#left} - ${#right} ))
-  printf "%s%*s" "$left" $dots "."  | sed 's/ /./g'
+  local width=$3
+  local dots=$(( $width - ${#left} - ${#right} ))
+  debug "DEBUG: left=$left right=$right width=$width space=$dots"
+  printf "%s%*s" "$left" $dots " "  | sed 's/  /../g'
 }
 
 
@@ -95,10 +108,10 @@ dotline() {
 start_service()
 {
 	echo "Service: "$service_name" mounting.."
-	echo "Mountpoint: "$mountpoint
-
+	
 	# mountpoint and rclone service name must be defined with lowercase. PID read to variable PIDR
 	rclone --vfs-cache-mode writes mount $service_name: $mountpoint & # PIDR=$!
+	echo -n " - Mountpoint: $mountpoint mounted succesfully. "
 	#echo $PIDR > $pidfile
 }
 
@@ -147,10 +160,10 @@ mainf(){
 		fi
 		
 		#echo "$serv_counter) $service_name $mounted_text"
-		dotline "$serv_counter) $service_name" $mounted_text 56
-		printf "%s" "["
+		dotline "$serv_counter) $service_name" "$mounted_text" 56
+		printf "%s" "[ "
 		color_text "$mounted_text" $color
-		printf "%s\n" "]"
+		printf "%s\n" " ]"
 		
 		#echo$mounted_color_text
 
@@ -202,13 +215,14 @@ mainf(){
 		if [ $mounted -eq 1 ]
 		then
 
-			echo -en "\nDo you want to UNMOUNT the service: \""$service_name"\"?\n   Answer (y)es/(n)o and enter: ";
+			echo -en "\n$ref_id) Do you want to UNMOUNT the service: \""$service_name"\"?\n   Answer (y)es/(n)o and enter: ";
 			read confi
 			if [ "$confi" == "y" ]
 			then
 				# Calling the kill function
 				unmount_service $mountpoint
-				echo "Done!"
+				color_text  " [ OK ]" "yellow"
+				echo
 				#break
 			elif [ "$confi" == "n" ]
 			then
@@ -223,7 +237,7 @@ mainf(){
 				mkdir -p $mountpoint
 			fi
 			
-			echo "The service: \"$service_name\" will start in 5 seconds.. Press CTRL-C to cancel!";
+			echo -e "\nThe service $ref_id) \"$service_name\" will start in 5 seconds.. Press CTRL-C to cancel!";
 			l=0
 			while [ $l -lt 5 ]
 			do
@@ -231,11 +245,13 @@ mainf(){
 				printf "."
 				let l++
 			done
-			echo "Starting"
+			echo -n "Starting the "
 			
 			# Call start service function
 			start_service
-			echo "Done!"
+			#echo "Done!"
+			color_text  " [ OK ]" "yellow"
+			echo
 		fi		
 	done
 }
